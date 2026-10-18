@@ -58,7 +58,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function geocodeAddress(address){
  let cache={};try{cache=JSON.parse(localStorage.getItem(geoCacheKey)||"{}")}catch{}
  const key=String(address||"").trim().toLowerCase();if(!key)return null;if(cache[key]&&Number.isFinite(cache[key].lat)&&Number.isFinite(cache[key].lon))return cache[key];
- const parts=String(address).split(",").map(x=>x.trim()).filter(Boolean);const queries=[String(address).trim(),parts.filter(x=>!/^\\d{5}-?\\d{3}$/.test(x)).join(", "),parts.filter((x,i)=>i!==1).join(", ")].filter((q,i,a)=>q&&a.indexOf(q)===i);
+ const parts=String(address).split(",").map(x=>x.trim()).filter(Boolean);const queries=[String(address).trim(),parts.filter(x=>!/^\d{5}-?\d{3}$/.test(x)).join(", "),parts.filter((x,i)=>i!==1).join(", ")].filter((q,i,a)=>q&&a.indexOf(q)===i);
  try{for(const query of queries){const response=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&country=Brasil&q="+encodeURIComponent(query),{headers:{Accept:"application/json"}});if(!response.ok)throw new Error("Serviço de localização respondeu "+response.status);const results=await response.json();if(!results.length)continue;const point={lat:Number(results[0].lat),lon:Number(results[0].lon)};if(!Number.isFinite(point.lat)||!Number.isFinite(point.lon))continue;cache[key]=point;try{localStorage.setItem(geoCacheKey,JSON.stringify(cache))}catch{}return point}return null}catch(error){console.warn("Não foi possível localizar o endereço:",error);return null}
 }
 async function initServiceMaps(){
