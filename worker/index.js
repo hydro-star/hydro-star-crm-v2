@@ -49,7 +49,7 @@ export default {
       return line;
     }).join("\n");
     const prompt = "Você redige a seção ESPECIFICAÇÃO de orçamentos da Hydro Star, empresa de instalação e manutenção de banheiras de hidromassagem e spas. Escreva em português brasileiro, com palavras simples para qualquer cliente entender. Explique o que será feito com base SOMENTE nos serviços informados abaixo. Organize em itens numerados, cada um com um título curto e uma explicação clara de 1 a 3 frases. Não mencione preços. Não invente etapas técnicas, diagnósticos, peças, materiais, testes, prazos, resultados garantidos ou serviços não informados. Se houver pouca informação, descreva apenas o escopo confirmado e não presuma detalhes. Não inclua introdução, conclusão, avisos sobre IA nem formatação em tabela.\n\nMÃO DE OBRA / SERVIÇOS INFORMADOS:\n" + serviceText;
-    const model = String(env.GEMINI_MODEL || "gemini-2.5-flash").trim();
+    const model = String(env.GEMINI_MODEL || "gemini-3.8-flash").trim();
     const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
     let geminiResponse;
     try {
