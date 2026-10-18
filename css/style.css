@@ -7,3 +7,37 @@
 .quote-line{min-width:0}.quote-line .field{min-width:0}.quote-line input{min-width:0;padding:9px 8px}.quote-line .field label{font-size:11px}
 @media(max-width:900px){.quote-line{grid-template-columns:repeat(2,minmax(0,1fr))!important}.quote-line>div:last-child{display:flex;align-items:center;justify-content:space-between;gap:8px}.quote-line>div:last-child [data-line-total]{white-space:nowrap}}
 @media(max-width:420px){.quote-line{grid-template-columns:1fr!important}.quote-line>div:last-child{justify-content:flex-start}}
+
+
+/* Agenda e planejamento de ordens de serviço */
+.agenda-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.agenda-datebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:12px}
+.agenda-datebar label{font-size:12px;font-weight:700;color:var(--muted)}
+.agenda-datebar input{padding:9px 10px;border:1px solid var(--line);border-radius:8px;color:var(--text)}
+.agenda-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:16px;align-items:start}
+.agenda-layout>.panel,.agenda-side>.panel{min-width:0}
+.agenda-side{display:grid;gap:16px}
+.calendar-head{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.calendar-head h3{margin:0;flex:1;text-align:center;font-size:16px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-weekdays{margin-bottom:6px;text-align:center;color:var(--muted);font-size:11px;font-weight:700}
+.calendar-cell{min-width:0;min-height:66px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:7px 5px;text-align:left;color:var(--text);display:flex;flex-direction:column;gap:5px}
+button.calendar-cell:hover{border-color:var(--blue)}
+.calendar-cell.selected{border-color:var(--blue);background:#eaf7fb;box-shadow:inset 0 0 0 1px var(--blue)}
+.calendar-cell.today>span{font-weight:900;color:var(--blue)}
+.calendar-cell small{font-size:10px;color:var(--blue);line-height:1.25}
+.calendar-empty{background:#f8fafc;border-style:dashed}
+.agenda-list{display:grid;gap:10px}
+.agenda-card{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff}
+.agenda-time{min-width:82px;font-size:12px;font-weight:800;color:var(--navy);padding-top:2px}
+.agenda-info{flex:1;min-width:0;display:grid;gap:5px}
+.agenda-info>strong{overflow-wrap:anywhere}
+.agenda-info .tag{margin-left:4px}
+.map-note{background:#f4f9fc;border-radius:9px;padding:11px 12px;color:var(--muted);font-size:12px;margin-bottom:12px}
+.map-stops{display:grid;gap:9px}
+.map-stop{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.map-stop>div{flex:1;min-width:0;overflow-wrap:anywhere}
+.map-number{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:var(--navy);color:white;display:grid;place-items:center;font-weight:800;font-size:12px}
+.service-list-panel{margin-top:16px}
+@media(max-width:1050px){.agenda-layout{grid-template-columns:1fr}.agenda-side{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.agenda-side{grid-template-columns:1fr}.calendar-cell{min-height:53px;padding:5px 3px;font-size:12px}.calendar-cell small{font-size:9px}.agenda-card{flex-wrap:wrap}.agenda-time{min-width:66px}.map-stop{flex-wrap:wrap}.map-stop>div{min-width:calc(100% - 45px)}.agenda-datebar input{flex:1;min-width:150px}}
