@@ -49,3 +49,19 @@ button.calendar-cell:hover{border-color:var(--blue)}
 
 /* Clearly grouped address and map-location fields. */
 .address-section{border:1px solid #8bc5d7;border-radius:12px;padding:15px;background:#f4fbfd;margin:8px 0}.address-section>label{font-size:13px!important;font-weight:800!important;color:#165b88!important;letter-spacing:.04em}.address-fields{margin-top:10px;gap:12px}
+
+
+/* Identidade visual Hydro Star: roxo profundo com gradiente roxo-vermelho. */
+:root{--navy:#25142d;--navy2:#43244f;--blue:#7b4397;--cyan:#f1e7f5;--bg:#f8f5f9;--card:#fff;--text:#2d2331;--muted:#756b7b;--line:#e7dfe9;--green:#177245;--red:#dc2430;--shadow:0 8px 28px #25142d12}
+.btn.primary,.nav button.active,.nav button:hover{background:linear-gradient(115deg,#7b4397 0%,#dc2430 100%);border-color:#7b4397;color:#fff}
+.btn.primary:hover{filter:brightness(1.06)}
+.logo{color:#25142d}
+.stat-icon{background:#f1e7f5;color:#7b4397}
+.quick:hover{border-color:#b58ac7;background:#fcf8fd}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#7b4397;box-shadow:0 0 0 3px #7b43971c}
+.address-section{border-color:#b58ac7;background:#fcf8fd}
+.address-section>label{color:#7b4397!important}
+.map-number,.hydro-map-marker{background:#7b4397}
+.map-popup-actions a{color:#7b4397}
+.calendar-cell.selected{border-color:#7b4397;background:#f5edf8;box-shadow:inset 0 0 0 1px #7b4397}
+.calendar-cell.today>span,.calendar-cell small{color:#7b4397}
