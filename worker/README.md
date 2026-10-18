@@ -18,7 +18,7 @@ Esta pasta contém um Cloudflare Worker para manter a chave da API do Gemini for
 2. Entre nesta pasta: worker.
 3. Publique o Worker com o comando: npx wrangler deploy.
 4. Configure a chave como segredo, sem colocá-la em arquivos do repositório: npx wrangler secret put GEMINI_API_KEY. Cole a chave quando o terminal solicitar.
-5. Opcionalmente, configure o modelo com npx wrangler secret put GEMINI_MODEL se precisar usar outro modelo habilitado no nível gratuito. O padrão configurado é gemini-2.5-flash.
+5. Opcionalmente, configure o modelo com npx wrangler secret put GEMINI_MODEL se precisar usar outro modelo habilitado no nível gratuito. O padrão configurado é gemini-3.8-flash.
 6. No CRM, abra Dados e configurações, cole a URL HTTPS do Worker seguida de /generate-specification e clique em Salvar conexão.
 
 ## Teste seguro
