@@ -53,13 +53,41 @@ return '<div class="welcome"><div><h2>Ordens de serviço</h2><div class="muted">
 }
 function settingsPage(){return '<div class="welcome"><div><h2>Dados e configurações</h2><div class="muted">Controle o backup e entenda como seus dados são armazenados.</div></div></div><div class="notice"><strong>Importante sobre armazenamento local</strong>Os registros ficam neste navegador e neste perfil de usuário. Eles não são sincronizados com outros computadores nem ficam salvos no repositório GitHub. Se limpar os dados do navegador, os registros podem ser perdidos.</div><div class="settings-grid"><section class="panel"><div class="panel-head"><h3>Backup dos dados</h3><span class="stat-icon">⇩</span></div><p class="muted">Exporte clientes, orçamentos e ordens de serviço em um arquivo JSON para guardar como cópia de segurança.</p><button class="btn primary" data-action="export">⇩ Exportar backup</button><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h3>Restaurar backup</h3><p class="muted">Importe um arquivo exportado anteriormente. Os registros com os mesmos identificadores serão atualizados; os demais serão adicionados.</p><button class="btn" data-action="import">⇧ Importar arquivo JSON</button></section><section class="panel"><div class="panel-head"><h3>Armazenamento</h3><span class="stat-icon">▣</span></div><div class="detail"><div class="detail-item"><small>Banco ativo</small><strong>'+(fallback?"localStorage":"IndexedDB")+'</strong></div><div class="detail-item"><small>Clientes</small><strong>'+state.clients.length+'</strong></div><div class="detail-item"><small>Orçamentos</small><strong>'+state.quotes.length+'</strong></div><div class="detail-item"><small>Ordens de serviço</small><strong>'+state.services.length+'</strong></div></div><p class="muted small" style="margin-top:14px">Não inclua informações altamente sensíveis. Use senha no computador e mantenha os backups em local protegido.</p><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h3>Apagar todos os dados</h3><p class="muted">Remove os cadastros locais deste sistema neste navegador. Essa ação não pode ser desfeita sem backup.</p><button class="btn danger" data-action="clear">Apagar todos os dados locais</button></section></div>'}
 function render(){const content=$("#content");$("#pageTitle").textContent=titles[state.page]||"Hydro Star CRM";$("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.page===state.page));content.innerHTML=({dashboard,clients:clientsPage,quotes:quotesPage,services:servicesPage,settings:settingsPage}[state.page]||dashboard)();$("#headerAdd").textContent=state.page==="clients"?"＋ Novo cliente":state.page==="quotes"?"＋ Novo orçamento":state.page==="services"?"＋ Nova ordem":"＋ Novo cadastro";$("#headerAdd").onclick=()=>{if(state.page==="clients")openForm("client");else if(state.page==="quotes")openForm("quote");else if(state.page==="services")openForm("service");else showQuickModal()};if(state.page==="services")initServiceMaps()}
-const geoCacheKey="hydro-star-crm-geocode-v1";
+const geoCacheKey="hydro-star-crm-geocode-v2";
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function geocodeAddress(address){
  let cache={};try{cache=JSON.parse(localStorage.getItem(geoCacheKey)||"{}")}catch{}
- const key=String(address||"").trim().toLowerCase();if(!key)return null;if(cache[key]&&Number.isFinite(cache[key].lat)&&Number.isFinite(cache[key].lon))return cache[key];
- const parts=String(address).split(",").map(x=>x.trim()).filter(Boolean);const queries=[String(address).trim(),parts.filter(x=>!/^\d{5}-?\d{3}$/.test(x)).join(", "),parts.filter((x,i)=>i!==1).join(", ")].filter((q,i,a)=>q&&a.indexOf(q)===i);
- try{for(const query of queries){const response=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&country=Brasil&q="+encodeURIComponent(query),{headers:{Accept:"application/json"}});if(!response.ok)throw new Error("Serviço de localização respondeu "+response.status);const results=await response.json();if(!results.length)continue;const point={lat:Number(results[0].lat),lon:Number(results[0].lon)};if(!Number.isFinite(point.lat)||!Number.isFinite(point.lon))continue;cache[key]=point;try{localStorage.setItem(geoCacheKey,JSON.stringify(cache))}catch{}return point}return null}catch(error){console.warn("Não foi possível localizar o endereço:",error);return null}
+ const key=String(address||"").trim().toLocaleLowerCase("pt-BR");if(!key)return null;
+ if(cache[key]&&Number.isFinite(cache[key].lat)&&Number.isFinite(cache[key].lon))return cache[key];
+ const parts=String(address).split(",").map(x=>x.trim()).filter(Boolean);
+ const queries=[String(address).trim(),parts.filter(x=>!/^\\d{5}-?\\d{3}$/.test(x)).join(", "),parts.filter((x,i)=>i!==1).join(", ")].filter((q,i,a)=>q&&a.indexOf(q)===i);
+ try{
+  // Photon costuma funcionar melhor em navegadores sem exigir chave de API.
+  for(const query of queries.slice(0,2)){
+   try{
+    const response=await fetch("https://photon.komoot.io/api/?limit=1&lang=pt&q="+encodeURIComponent(query));
+    if(!response.ok)continue;
+    const data=await response.json();const feature=data.features&&data.features[0];
+    if(feature&&feature.geometry&&Array.isArray(feature.geometry.coordinates)){
+     const point={lat:Number(feature.geometry.coordinates[1]),lon:Number(feature.geometry.coordinates[0])};
+     const country=String(feature.properties?.country||"").toLocaleLowerCase("pt-BR");
+     if(Number.isFinite(point.lat)&&Number.isFinite(point.lon)&&(!country||country.includes("brasil")||country.includes("brazil"))){
+      cache[key]=point;try{localStorage.setItem(geoCacheKey,JSON.stringify(cache))}catch{}return point;
+     }
+    }
+   }catch(error){console.warn("Photon não respondeu para o endereço:",error)}
+  }
+  // Alternativa: Nominatim, restrito ao Brasil.
+  for(const query of queries){
+   const response=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=br&q="+encodeURIComponent(query),{headers:{Accept:"application/json"}});
+   if(!response.ok){console.warn("Nominatim respondeu",response.status);continue}
+   const results=await response.json();if(!results.length)continue;
+   const point={lat:Number(results[0].lat),lon:Number(results[0].lon)};
+   if(!Number.isFinite(point.lat)||!Number.isFinite(point.lon))continue;
+   cache[key]=point;try{localStorage.setItem(geoCacheKey,JSON.stringify(cache))}catch{}return point;
+  }
+  return null;
+ }catch(error){console.warn("Não foi possível localizar o endereço:",error);return null}
 }
 async function initServiceMaps(){
  if(!window.L){
