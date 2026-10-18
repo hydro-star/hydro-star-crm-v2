@@ -48,12 +48,40 @@ export default {
       if (item.quantity > 0) line += " (quantidade: " + item.quantity + (item.unit ? " " + item.unit : "") + ")";
       return line;
     }).join("\n");
-    const prompt = "Você redige a seção ESPECIFICAÇÃO de orçamentos da Hydro Star, empresa de instalação e manutenção de banheiras de hidromassagem e spas. Escreva em português brasileiro, com palavras simples para qualquer cliente entender. Explique o que será feito com base SOMENTE nos serviços informados abaixo. Organize em itens numerados, cada um com um título curto e uma explicação clara de 1 a 3 frases. Não mencione preços. Não invente etapas técnicas, diagnósticos, peças, materiais, testes, prazos, resultados garantidos ou serviços não informados. Se houver pouca informação, descreva apenas o escopo confirmado e não presuma detalhes. Não inclua introdução, conclusão, avisos sobre IA nem formatação em tabela.\n\nMÃO DE OBRA / SERVIÇOS INFORMADOS:\n" + serviceText;
+    const prompt = [
+      "Você redige a seção ESPECIFICAÇÃO dos orçamentos comerciais da Hydro Star. Seu texto será inserido em uma proposta comercial para o cliente.",
+      "",
+      "OBJETIVO E TOM",
+      "- Escreva em português brasileiro, com tom profissional, claro, cordial e comercial.",
+      "- Use termos técnicos somente quando ajudarem a explicar o serviço; prefira palavras que qualquer cliente entenda.",
+      "- Seja específico e informativo, evitando texto genérico, repetitivo ou excessivamente curto.",
+      "- O nível de detalhe deve acompanhar as informações fornecidas: explique melhor o que estiver descrito, sem completar lacunas com suposições.",
+      "",
+      "ESTRUTURA",
+      "- Organize os serviços em itens numerados, seguindo a ordem recebida.",
+      "- Cada item deve ter um título curto e objetivo e, abaixo, um parágrafo explicando o escopo do serviço.",
+      "- Quando as informações fornecidas permitirem identificar etapas distintas, apresente-as em uma sequência lógica e fácil de acompanhar. Não crie etapas só para alongar o texto.",
+      "- Mantenha a apresentação limpa, consistente e adequada a uma proposta comercial: títulos claros, parágrafos bem redigidos e sem listas excessivas.",
+      "- Preserve quantidades, unidades e nomes de serviços informados, quando relevantes.",
+      "",
+      "FIDELIDADE AO ESCOPO — REGRA OBRIGATÓRIA",
+      "- Use EXCLUSIVAMENTE os dados de Mão de obra / serviços informados abaixo.",
+      "- Não invente materiais, peças, marcas, métodos de instalação, etapas técnicas, diagnósticos, testes, adequações, prazos, garantias, resultados ou serviços que não tenham sido informados.",
+      "- Não transforme uma possibilidade em algo confirmado. Se faltarem detalhes, descreva com clareza somente o que foi efetivamente informado.",
+      "- Não inclua preços, valores, condições de pagamento, introdução geral, conclusão, observações sobre IA ou comentários dirigidos ao responsável pelo orçamento.",
+      "",
+      "FORMATO DE SAÍDA",
+      "- Retorne somente o texto final da seção ESPECIFICAÇÃO, pronto para ser inserido no orçamento.",
+      "- Não use tabela, saudação ou título geral adicional 'ESPECIFICAÇÃO'; comece diretamente pelo primeiro item numerado.",
+      "",
+      "MÃO DE OBRA / SERVIÇOS INFORMADOS:",
+      serviceText
+    ].join("\n")
     const model = String(env.GEMINI_MODEL || "gemini-3.8-flash").trim();
     const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
     let geminiResponse;
     try {
-      geminiResponse = await fetch(apiUrl,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":env.GEMINI_API_KEY},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.2,maxOutputTokens:1200}})});
+      geminiResponse = await fetch(apiUrl,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":env.GEMINI_API_KEY},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.25,maxOutputTokens:2000}})});
     } catch {
       return json({error:"Não foi possível acessar o serviço do Gemini. Tente novamente."},502,origin);
     }
