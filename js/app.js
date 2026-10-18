@@ -68,7 +68,16 @@ async function geocodeAddress(address){
  }catch(error){console.warn("Não foi possível localizar o endereço:",error);return null}
 }
 async function initServiceMaps(){
- if(!window.L){document.querySelectorAll(".service-leaflet-map").forEach(el=>el.innerHTML='<div class="map-loading">O mapa não carregou. Confira sua conexão e atualize a página.</div>');return}
+ if(!window.L){
+  document.querySelectorAll(".service-leaflet-map").forEach(el=>el.innerHTML='<div class="map-loading">Carregando biblioteca do mapa…</div>');
+  if(window._hydroLeafletLoading)return;
+  window._hydroLeafletLoading=true;
+  if(!document.querySelector("link[data-hydro-leaflet-fallback]")){const css=document.createElement("link");css.rel="stylesheet";css.href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css";css.dataset.hydroLeafletFallback="true";document.head.appendChild(css)}
+  const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js";
+  script.onload=()=>{window._hydroLeafletLoading=false;initServiceMaps()};
+  script.onerror=()=>{window._hydroLeafletLoading=false;document.querySelectorAll(".service-leaflet-map").forEach(el=>el.innerHTML='<div class="map-loading">Não foi possível carregar o mapa neste navegador/rede. Use “Ver no mapa” ou “Abrir rota no Google Maps” abaixo.</div>')};
+  document.head.appendChild(script);return
+ }
  const containers=[...document.querySelectorAll(".service-leaflet-map")];
  for(const el of containers){
   if(el.dataset.mapReady==="true")continue;
