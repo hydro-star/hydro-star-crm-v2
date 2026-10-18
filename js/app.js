@@ -41,14 +41,14 @@ const labors=laborItems.length?laborItems:[{kind:"labor",name:record?.title||"",
 const lineRows=(list,kind)=>list.map((x,i)=>'<div class="quote-line" data-line-kind="'+kind+'" style="display:grid;grid-template-columns:1.4fr 1.3fr .55fr .65fr .8fr auto;gap:8px;align-items:end;margin:8px 0"><div class="field"><label>'+ (kind==="material"?"Material / serviço":"Mão de obra")+'</label><input data-line="name" value="'+esc(x.name||"")+'" placeholder="Nome do item"></div><div class="field"><label>Descrição / notas</label><input data-line="description" value="'+esc(x.description||"")+'" placeholder="Detalhes"></div><div class="field"><label>Unidade</label><input data-line="unit" value="'+esc(x.unit||"UN")+'" placeholder="UN"></div><div class="field"><label>Qtd.</label><input data-line="quantity" type="number" min="0" step="0.01" value="'+Number(x.quantity??1)+'"></div><div class="field"><label>Valor unit. (R$)</label><input data-line="unitPrice" type="number" min="0" step="0.01" value="'+Number(x.unitPrice??0)+'"></div><div><button type="button" class="btn smallbtn danger" data-remove-line aria-label="Remover item">×</button><div class="muted small" data-line-total>'+money(Number(x.quantity||0)*Number(x.unitPrice||0))+'</div></div></div>').join("");
 fields=field("Título do orçamento *","title",record?.title||"","text",null,true,"Ex.: Instalação de banheira")
 +field("Cliente cadastrado","clientId",record?.clientId||"","text",state.clients.map(c=>({value:c.id,label:c.name})))
-+'<div class="field" style="align-self:end"><button type="button" class="btn" data-action="toggle-new-quote-client">＋ Cadastrar cliente neste orçamento</button></div>
++'<div class="field" style="align-self:end"><button type="button" class="btn" data-action="toggle-new-quote-client">＋ Cadastrar cliente neste orçamento</button></div>'
 +'<div class="field full" id="newQuoteClientFields" style="display:none;border:1px solid var(--line);border-radius:12px;padding:14px"><strong>Novo cliente</strong><div class="form-grid" style="margin-top:10px">'
 +field("Nome do cliente *","newClientName","","text",null,false,"Nome completo ou empresa")
 +field("Telefone / WhatsApp","newClientPhone","","tel")
 +field("E-mail","newClientEmail","","email")
 +field("Cidade","newClientCity","")
 +field("Endereço","newClientAddress","")
-+'</div></div>
++'</div></div>'
 +field("Telefone para este orçamento","customerPhone",record?.customerPhone||state.clients.find(c=>c.id===record?.clientId)?.phone||"","tel")
 +field("Endereço do cliente","customerAddress",record?.customerAddress||state.clients.find(c=>c.id===record?.clientId)?.address||"","text",null,true)
 +field("Responsável","responsible",record?.responsible||"Devanil Júnior")
