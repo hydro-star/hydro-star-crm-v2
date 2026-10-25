@@ -20,30 +20,29 @@ const wrapped=(p,value,x,y,max=82,size=12,gap=18)=>{const words=String(value).sp
 {const p=pages[0];box(p,275,0,493,45,cream);draw(p,customer,385,11,14,{bold:true,maxWidth:340});box(p,275,895,195,78,cream);draw(p,dateText,290,925,12,{bold:true})}
 {const p=pages[1];
 // Apaga toda a área variável do texto antigo, inclusive o placeholder, antes de escrever a especificação.
-box(p,35,135,698,770,white);draw(p,"ESPECIFICAÇÃO",62,153,16,{bold:true,color:pink});if(spec)wrapped(p,spec,62,190);else draw(p,"Especificação não informada no orçamento.",62,190,12)}
+box(p,35,135,698,770,white);if(spec)wrapped(p,spec,62,153);else draw(p,"Especificação não informada no orçamento.",62,153,12)}
 {const p=pages[2];
 // Limpa por inteiro a região variável para que os textos de desconto do template não vazem para a tabela.
 box(p,25,130,718,770,white);draw(p,"RESUMO DE INVESTIMENTOS",48,145,16,{bold:true,color:pink});
 draw(p,"DESCRIÇÃO",48,190,10,{bold:true});draw(p,"VALOR UNITÁRIO",390,190,10,{bold:true});draw(p,"VALOR TOTAL",565,190,10,{bold:true});
 line(p,42,210,720,210,1,dark);
+const materialQty=materials.reduce((s,x)=>s+Number(x.quantity||0),0),laborQty=labor.reduce((s,x)=>s+Number(x.quantity||0),0);
+const materialUnit=materialQty?(mat+profit)/materialQty:mat+profit,laborUnit=laborQty?(lab+risk)/laborQty:lab+risk;
 const rows=[
-["Materiais (custo base)",fmt(mat),fmt(mat)],
-["Acréscimo sobre materiais ("+profitRate+"%)","—",fmt(profit)],
-["Mão de obra (custo base)",fmt(lab),fmt(lab)],
-["Adicional de risco ("+riskRate+"%)","—",fmt(risk)]
+["Materiais",fmt(materialUnit),fmt(mat+profit)],
+["Mão de obra",fmt(laborUnit),fmt(lab+risk)]
 ];
-rows.forEach((r,i)=>{const y=232+i*36;draw(p,r[0],48,y,11,{maxWidth:320});draw(p,r[1],390,y,11,{maxWidth:145});draw(p,r[2],565,y,11,{maxWidth:145});line(p,42,y+24,720,y+24,.4,PDFLib.rgb(.78,.78,.78))});
-draw(p,"TOTAL DO ORÇAMENTO",390,390,12,{bold:true});draw(p,fmt(total),565,390,13,{bold:true,color:pink});line(p,42,418,720,418,1,dark);
-draw(p,"OPÇÕES DE DESCONTO",48,455,12,{bold:true,color:pink});
-draw(p,"0% — Até 10x sem juros: "+fmt(total),48,485,11);
-draw(p,"4% — 1x no crédito: "+fmt(total*.96),48,512,11);
-draw(p,"7% de desconto: "+fmt(total*.93),48,539,11);
-draw(p,"Os acréscimos de materiais e risco estão discriminados acima.",48,585,9,{color:dark});
+rows.forEach((r,i)=>{const y=232+i*42;draw(p,r[0],48,y,11,{maxWidth:320});draw(p,r[1],390,y,11,{maxWidth:145});draw(p,r[2],565,y,11,{maxWidth:145});line(p,42,y+25,720,y+25,.4,PDFLib.rgb(.78,.78,.78))});
+draw(p,"TOTAL DO ORÇAMENTO",390,330,12,{bold:true});draw(p,fmt(total),565,330,13,{bold:true,color:pink});line(p,42,355,720,355,1,dark);
+draw(p,"OPÇÕES DE DESCONTO",48,390,12,{bold:true,color:pink});
+draw(p,"0% — Até 10x sem juros: "+fmt(total),48,420,11);
+draw(p,"4% — 1x no crédito: "+fmt(total*.96),48,447,11);
+draw(p,"7% de desconto: "+fmt(total*.93),48,474,11);
 }
-{const p=pages[3];box(p,0,45,768,90,white);draw(p,"LISTA DE MATERIAIS",272,75,16,{bold:true});box(p,48,125,670,300,white);draw(p,"Material",62,140,11,{bold:true});draw(p,"Descrição / modelo",430,140,11,{bold:true});const rows=materials.length?materials:[{name:"",description:""}];for(let i=0;i<Math.max(rows.length,8);i++){const it=rows[i]||{},y=175+i*29;draw(p,it.name||"",62,y,10,{maxWidth:320});draw(p,it.description||(it.quantity?"Quantidade: "+it.quantity:""),430,y,10,{maxWidth:270});line(p,58,y+12,710,y+12,.4,PDFLib.rgb(.75,.75,.75))}box(p,0,920,768,104,white)}
+{const p=pages[3];box(p,0,45,768,90,white);draw(p,"LISTA DE MATERIAIS",272,75,16,{bold:true});box(p,48,125,670,300,white);draw(p,"Material",62,140,11,{bold:true});draw(p,"Descrição / modelo",430,140,11,{bold:true});const rows=materials.length?materials:[{name:"",description:""}];for(let i=0;i<rows.length;i++){const it=rows[i]||{},y=175+i*29;draw(p,it.name||"",62,y,10,{maxWidth:320});draw(p,it.description||(it.quantity?"Quantidade: "+it.quantity:""),430,y,10,{maxWidth:270});line(p,58,y+12,710,y+12,.4,PDFLib.rgb(.75,.75,.75))}box(p,0,920,768,104,white)}
 {const p=pages[4];box(p,85,175,610,120,white);draw(p,"PROPOSTA VÁLIDA: "+safe(q.validityDays||7)+" dias",96,190,13,{bold:true});draw(p,"PRAZO DE ENTREGA: "+deadline,96,215,13,{bold:true});draw(p,"GARANTIA DA INSTALAÇÃO: "+safe(company.installationWarranty||"3 meses"),96,240,13,{bold:true});draw(p,"*A contar da entrega da instalação e assinatura do Laudo de Entrega.",96,262,9,{maxWidth:580});if(address){box(p,95,298,590,23,white);draw(p,"ENDEREÇO: "+address,96,302,10,{maxWidth:570})}
 // Desenha o visto como linhas para evitar falha de codificação do caractere ✔ na fonte padrão.
-box(p,70,895,650,65,white);line(p,85,918,91,924,1.5,pink);line(p,91,924,101,910,1.5,pink);draw(p,"FASCINAÇÃO por Excelência, Segurança e Pontualidade",110,910,11,{bold:true,maxWidth:590})}
+box(p,45,885,700,90,white);line(p,85,918,91,924,1.5,pink);line(p,91,924,101,910,1.5,pink);draw(p,"FASCINAÇÃO por Excelência, Segurança e Pontualidade",110,910,11,{bold:true,maxWidth:590})}
 const blob=new Blob([await pdf.save()],{type:"application/pdf"}),url=URL.createObjectURL(blob),win=window.open(url,"_blank");if(!win){URL.revokeObjectURL(url);alert("O navegador bloqueou a janela do PDF. Permita pop-ups para este site e tente novamente.")}
 })().catch(err=>{console.error("Hydro Star PDF:",err);alert("Não foi possível gerar o PDF: "+(err.message||"erro inesperado"))})
 }
