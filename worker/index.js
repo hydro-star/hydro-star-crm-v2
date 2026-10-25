@@ -1,3 +1,5 @@
+import { generateSpecificationWithFallback } from "./gemini-client.js";
+
 const ALLOWED_ORIGINS = new Set([
   "https://hydro-star.github.io",
   "http://localhost:8000",
@@ -14,6 +16,7 @@ function json(data, status, origin) {
   }
   return new Response(JSON.stringify(data), {status:status,headers:headers});
 }
+
 
 export default {
   async fetch(request, env) {
@@ -77,18 +80,11 @@ export default {
       "MÃO DE OBRA / SERVIÇOS INFORMADOS:",
       serviceText
     ].join("\n")
-    const model = String(env.GEMINI_MODEL || "gemini-3.8-flash").trim();
-    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
-    let geminiResponse;
-    try {
-      geminiResponse = await fetch(apiUrl,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":env.GEMINI_API_KEY},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.25,maxOutputTokens:2000}})});
-    } catch {
-      return json({error:"Não foi possível acessar o serviço do Gemini. Tente novamente."},502,origin);
+    const generated = await generateSpecificationWithFallback(prompt, env);
+    if (!generated.ok) {
+      return json({error:generated.userMessage}, generated.httpStatus || 502, origin);
     }
-    let result;
-    try { result = await geminiResponse.json(); } catch { result = {}; }
-    if (!geminiResponse.ok) return json({error:"O Gemini não conseguiu gerar o texto. Verifique a configuração da API e tente novamente."},502,origin);
-    const specification = (result.candidates && result.candidates[0] && result.candidates[0].content && result.candidates[0].content.parts || []).map((part)=>part.text||"").join("").trim();
+    const specification = generated.specification;
     if (!specification) return json({error:"O Gemini não retornou texto. Revise a descrição dos serviços e tente novamente."},502,origin);
     return json({specification:specification},200,origin);
   }
