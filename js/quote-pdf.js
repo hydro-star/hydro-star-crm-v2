@@ -34,14 +34,14 @@ rows.forEach((r,i)=>{const y=260+i*42;draw(p,r[0],48,y,11,{maxWidth:320});draw(p
 draw(p,"TOTAL DO ORÇAMENTO",48,355,10,{bold:true,maxWidth:300});draw(p,fmt(total),390,355,13,{bold:true,color:pink,maxWidth:120});line(p,42,378,510,378,1,dark);
 // Cada desconto ocupa um bloco próprio. Os rótulos são divididos manualmente para
 // que a quebra automática de linha não invada a linha do valor em R$.
-draw(p,"0% = ATÉ 10X SEM JUROS",535,212,8.5,{bold:true});
-draw(p,"NO CARTÃO",535,224,8.5,{bold:true});
-draw(p,fmt(total),535,239,11,{bold:true,color:pink});
-draw(p,"4% = 1X NO CRÉDITO",535,268,8.5,{bold:true});
-draw(p,"OU DÉBITO",535,280,8.5,{bold:true});
-draw(p,fmt(total*0.96),535,295,11,{bold:true,color:pink});
-draw(p,"7% = À VISTA (PIX)",535,324,8.5,{bold:true});
-draw(p,fmt(total*0.93),535,341,11,{bold:true,color:pink});
+draw(p,"0% = ATÉ 10X SEM JUROS",535,244,8.5,{bold:true});
+draw(p,"NO CARTÃO",535,256,8.5,{bold:true});
+draw(p,fmt(total),535,271,11,{bold:true,color:pink});
+draw(p,"4% = 1X NO CRÉDITO",535,290,8.5,{bold:true});
+draw(p,"OU DÉBITO",535,302,8.5,{bold:true});
+draw(p,fmt(total*0.96),535,317,11,{bold:true,color:pink});
+draw(p,"7% = À VISTA (PIX)",535,337,8.5,{bold:true});
+draw(p,fmt(total*0.93),535,354,11,{bold:true,color:pink});
 }
 {const p=pages[3];box(p,0,45,768,90,white);draw(p,"LISTA DE MATERIAIS",272,75,16,{bold:true});box(p,48,125,670,300,white);draw(p,"Material",62,140,11,{bold:true});draw(p,"Descrição / modelo",430,140,11,{bold:true});const rows=materials.length?materials:[{name:"",description:""}];for(let i=0;i<rows.length;i++){const it=rows[i]||{},y=175+i*29;draw(p,it.name||"",62,y,10,{maxWidth:320});draw(p,it.description||(it.quantity?"Quantidade: "+it.quantity:""),430,y,10,{maxWidth:270});line(p,58,y+12,710,y+12,.4,PDFLib.rgb(.75,.75,.75))}box(p,0,920,768,104,white)}
 {const p=pages[4];box(p,85,175,610,120,white);draw(p,"PROPOSTA VÁLIDA: "+safe(q.validityDays||7)+" dias",96,190,13,{bold:true});draw(p,"PRAZO DE ENTREGA: "+deadline,96,215,13,{bold:true});draw(p,"GARANTIA DA INSTALAÇÃO: "+safe(company.installationWarranty||"3 meses"),96,240,13,{bold:true});draw(p,"*A contar da entrega da instalação e assinatura do Laudo de Entrega.",96,262,9,{maxWidth:580});if(address){box(p,95,298,590,23,white);draw(p,"ENDEREÇO: "+address,96,302,10,{maxWidth:570})}
