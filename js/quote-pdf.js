@@ -31,7 +31,7 @@ draw(p,"DESCRIÇÃO DO SERVIÇO",48,216,10,{bold:true});
 line(p,42,236,720,236,1,dark);
 const rows=[["Materiais",fmt(mat+profit)],["Mão de Obra",fmt(lab+risk)]];
 rows.forEach((r,i)=>{const y=260+i*42;draw(p,r[0],48,y,11,{maxWidth:320});draw(p,r[1],390,y,11,{maxWidth:125});line(p,42,y+25,510,y+25,.4,PDFLib.rgb(.78,.78,.78))});
-draw(p,"TOTAL DO ORÇAMENTO",245,355,10,{bold:true});draw(p,fmt(total),390,355,13,{bold:true,color:pink});line(p,42,378,510,378,1,dark);
+draw(p,"TOTAL DO ORÇAMENTO",48,355,10,{bold:true,maxWidth:300});draw(p,fmt(total),390,355,13,{bold:true,color:pink,maxWidth:120});line(p,42,378,510,378,1,dark);
 // Cada desconto ocupa um bloco próprio. Os rótulos são divididos manualmente para
 // que a quebra automática de linha não invada a linha do valor em R$.
 draw(p,"0% = ATÉ 10X SEM JUROS",535,212,8.5,{bold:true});
