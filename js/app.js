@@ -41,11 +41,11 @@ function generateQuotePdf(q){
  const laborTotal=Number(q.laborSubtotal||items.filter(x=>x.kind==="labor").reduce((s,x)=>s+Number(x.quantity||0)*Number(x.unitPrice||0),0));
  const riskValue=Number(q.riskValue||laborTotal*Number(q.riskRate||0)/100);
  const total=Number(q.value??materialTotal+materialProfit+laborTotal+riskValue);
- const discounts=[0,4,7].map(rate=>({rate,total:Number((total*(1-rate/100)).toFixed(2))}));
+ const discounts=[];
  const address=[q.customerAddress||client.address,q.neighborhood||client.neighborhood,[q.city||client.city,q.state||client.state].filter(Boolean).join(" - ")].filter(Boolean).join(", ");
  const itemRows=list=>list.length?list.map(x=>'<tr><td>'+text(x.name||x.description||"Item")+'</td><td>'+text(x.description&&x.name?x.description:"—")+'</td><td class="center">'+Number(x.quantity||0).toLocaleString("pt-BR")+' '+text(x.unit||"UN")+'</td><td class="right">'+fmt(x.unitPrice)+'</td><td class="right">'+fmt(Number(x.quantity||0)*Number(x.unitPrice||0))+'</td></tr>').join(""):'<tr><td colspan="5" class="empty-row">Nenhum item cadastrado.</td></tr>';
- const paymentLabel=rate=>({0:"EM ATÉ 10X SEM JUROS NO CARTÃO",4:"1X NO CRÉDITO OU DÉBITO",7:"À VISTA • PIX"})[Number(rate)]||"CONDIÇÃO DE PAGAMENTO"; const discountRows=discounts.filter(d=>[0,4,7].includes(Number(d.rate))).map(d=>'<div class="discount"><span><b>'+Number(d.rate||0)+'%</b> <small>DESCONTO</small><em>'+paymentLabel(d.rate)+'</em></span><strong>'+fmt(d.total)+'</strong></div>').join("");
- const title=text(q.title||"Proposta comercial");
+ const discountRows="";
+ const title=text("Hydro Star — Modelo de Proposta Comercial");
  const customer=text(client.name||"Cliente não identificado");
  const responsible=text(q.responsible||"Equipe Hydro Star");
  const quoteDate=text(date(q.date));
