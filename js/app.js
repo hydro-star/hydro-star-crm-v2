@@ -25,50 +25,7 @@ function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'
 function dashboard(){const pending=state.quotes.filter(q=>!["Aprovado","Cancelado"].includes(q.status));const open=state.services.filter(s=>!["Concluído","Cancelado"].includes(s.status));const total=state.quotes.filter(q=>q.status==="Aprovado").reduce((a,q)=>a+Number(q.value||0),0);const recent=[...state.services.map(s=>({...s,_kind:"service"})),...state.quotes.map(q=>({...q,_kind:"quote"}))].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,5);const recentRows=recent.map(x=>'<tr><td><strong>'+esc(x.title||x.description||"Registro")+'</strong><br><span class="muted small">'+esc(clientName(x.clientId))+'</span></td><td>'+ (x._kind==="quote"?"Orçamento":"Serviço")+'</td><td>'+statusTag(x.status)+'</td><td>'+money(x.value)+'</td></tr>').join("");return '<div class="welcome"><div><h2>Olá, Hydro Star 👋</h2><div class="muted">Aqui está um resumo da sua operação.</div></div></div><div class="notice"><strong>🔒 Seus dados ficam neste navegador</strong>Esta versão não usa Firebase nem envia cadastros para o GitHub. Faça backups em “Dados e configurações” e evite limpar os dados do navegador.</div><div class="stats">'+stat("♙","Clientes",state.clients.length,"Cadastros salvos localmente")+stat("▤","Orçamentos",state.quotes.length,pending.length+" aguardando decisão")+stat("⚒","Serviços em aberto",open.length,"Ordens não concluídas")+stat("R$","Orçamentos aprovados",money(total),"Soma dos valores aprovados")+'</div><div class="dashboard-grid"><section class="panel"><div class="panel-head"><h3>Atividade recente</h3><button class="btn smallbtn" data-nav="services">Ver serviços</button></div>'+(recentRows?table(["Registro","Tipo","Status","Valor"],recentRows):empty("▤","Ainda não há registros","Cadastre seu primeiro cliente ou orçamento.","new-client","＋ Cadastrar cliente"))+'</section><section class="panel"><div style="margin-top:0;padding-top:0"><div class="storage-line"><span class="dot"></span><span>Banco local ativo • <b>'+ (fallback?"localStorage":"IndexedDB")+'</b></span></div><p class="muted small">Dica: exporte um backup periodicamente e guarde-o em um local seguro.</p></div></section></div>'}
 function searchBar(placeholder,button,filters=""){return '<div class="toolbar"><div class="search"><input id="searchInput" placeholder="'+placeholder+'" value="'+esc(state.search)+'"></div>'+filters+'</div>'}
 function clientsPage(){let items=state.clients.filter(c=>(c.name+" "+(c.phone||"")+" "+(c.city||"")+" "+(c.email||"")).toLowerCase().includes(state.search.toLowerCase()));let rows=items.map(c=>'<tr><td><strong>'+esc(c.name)+'</strong><br><span class="muted small">'+esc(c.email||"Sem e-mail")+'</span></td><td>'+esc(c.phone||"—")+'</td><td>'+esc(c.city||"—")+'</td><td>'+esc(c.kind||"Residencial")+'</td><td><button class="btn smallbtn" data-edit="client" data-id="'+c.id+'">Editar</button> <button class="btn smallbtn danger" data-delete="client" data-id="'+c.id+'">Excluir</button></td></tr>').join("");return '<div class="welcome"><div><h2>Clientes</h2><div class="muted">Organize contatos e informações de atendimento.</div></div></div>'+searchBar("Buscar por nome, telefone ou cidade…","new-client")+'<section class="panel">'+(rows?table(["Cliente","Telefone","Cidade","Perfil","Ações"],rows):empty("♙",state.clients.length?"Nenhum cliente encontrado":"Nenhum cliente cadastrado",state.clients.length?"Tente outro termo de busca.":"Adicione o primeiro cliente para começar.","new-client","＋ Novo cliente"))+'</section>'}
-async function generateQuotePdfFromTemplate(q){
- if(!window.PDFLib){alert("A biblioteca de PDF ainda está carregando. Tente novamente.");return}
- try{
-  const response=await fetch(new URL("assets/hydro-star-proposta-template.pdf",document.baseURI));
-  if(!response.ok)throw new Error("PDF do Canva não encontrado em assets.");
-  const {PDFDocument,StandardFonts,rgb}=window.PDFLib;
-  const pdf=await PDFDocument.load(await response.arrayBuffer());
-  const pages=pdf.getPages(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
-  const client=state.clients.find(c=>c.id===q.clientId)||{}, company=q.company||{};
-  const items=Array.isArray(q.items)?q.items:[],materials=items.filter(x=>x.kind==="material");
-  const spec=String(q.specification||"").trim();
-  if(spec.length>2200||materials.length>12){alert("Revise a especificação (máximo 2.200 caracteres) e a lista de materiais (máximo 12 itens) para caber no modelo.");return}
-  const moneyFmt=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-  const mat=Number(q.materialsSubtotal??materials.reduce((s,x)=>s+Number(x.quantity||0)*Number(x.unitPrice||0),0));
-  const matProfit=Number(q.materialProfitValue??mat*Number(q.materialProfitRate||0)/100);
-  const laborItems=items.filter(x=>x.kind==="labor");
-  const labor=Number(q.laborSubtotal??laborItems.reduce((s,x)=>s+Number(x.quantity||0)*Number(x.unitPrice||0),0));
-  const risk=Number(q.riskValue??labor*Number(q.riskRate||0)/100),total=Number(q.value??mat+matProfit+labor+risk);
-  const H=p=>p.getHeight();
-  const mask=(p,x,t,w,h)=>p.drawRectangle({x,y:H(p)-t-h,width:w,height:h,color:rgb(1,1,1)});
-  const put=(p,v,x,t,size=9,b=false,max=0)=>{let z=String(v??"").replace(/[\\r\\n\\t]+/g," ").trim(),f=b?bold:font;if(max)while(z&&f.widthOfTextAtSize(z,size)>max)z=z.slice(0,-2)+"…";if(z)p.drawText(z,{x,y:H(p)-t-size,size,font:f,color:rgb(.16,.13,.17)})};
-  const wrap=(p,v,x,t,w,size=9,lh=13,n=15)=>{let line="",out=[];for(const word of String(v||"").split(/\\s+/)){const next=line?line+" "+word:word;if(font.widthOfTextAtSize(next,size)>w&&line){out.push(line);line=word}else line=next}if(line)out.push(line);out.slice(0,n).forEach((z,i)=>put(p,z,x,t+i*lh,size,false,w))};
-  const customer=client.name||"Cliente",service=q.title||"Serviços de instalação e manutenção";
-  mask(pages[0],145,7,270,24);put(pages[0],customer.toUpperCase(),155,12,9,true,245);
-  mask(pages[0],40,354,140,23);put(pages[0],service.toUpperCase(),45,360,7,true,130);
-  mask(pages[0],50,742,115,38);put(pages[0],"Proposed By: "+(q.responsible||"Hydro Star"),54,750,8,true,108);
-  mask(pages[0],220,741,100,54);put(pages[0],"Date: "+date(q.date),225,753,8,true,90);
-  mask(pages[1],42,105,510,190);put(pages[1],"ESPECIFICAÇÃO DO SERVIÇO",48,111,10,true,440);wrap(pages[1],spec||"Serviço a ser alinhado com o cliente.",48,145,490,9,14,16);
-  mask(pages[2],175,205,390,140);mask(pages[2],445,350,130,165);mask(pages[2],25,395,425,100);
-  put(pages[2],"Materiais",42,430,9,false,115);put(pages[2],moneyFmt(mat+matProfit),250,430,9,false,85);
-  put(pages[2],"Mão de Obra",42,462,9,false,115);put(pages[2],moneyFmt(labor+risk),250,462,9,false,85);
-  put(pages[2],moneyFmt(total),350,443,10,true,80);
-  mask(pages[3],35,98,530,210);put(pages[3],"Material",48,111,9,true,170);put(pages[3],"Descrição / modelo",300,111,9,true,220);
-  if(!materials.length)put(pages[3],"Nenhum material cadastrado.",48,140,9,false,450);
-  materials.forEach((it,i)=>{put(pages[3],it.name||it.description||"Material",48,140+i*13,8,false,230);put(pages[3],it.description||(Number(it.quantity||0)+" "+(it.unit||"UN")),300,140+i*13,8,false,245)});
-  mask(pages[4],70,145,490,91);put(pages[4],"PROPOSTA VÁLIDA: 7 dias",75,150,9,true,400);put(pages[4],"PRAZO DE ENTREGA: "+(q.deliveryDeadline?String(q.deliveryDeadline)+" dias":"A combinar"),75,169,9,true,440);put(pages[4],"GARANTIA DA INSTALAÇÃO: "+(company.installationWarranty||"3 meses"),75,188,9,true,440);
-  mask(pages[4],95,375,370,31);put(pages[4],"Vendas | WhatsApp "+(company.phone||"(12) 98216-2998"),100,380,9,false,350);
-  const blob=new Blob([await pdf.save()],{type:"application/pdf"}),url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url;a.download="Hydro-Star-Proposta.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
- }catch(e){console.error(e);alert("Falha ao gerar PDF com o modelo Canva: "+(e.message||"erro desconhecido"))}
-}
 function generateQuotePdf(q){
- generateQuotePdfFromTemplate(q);
- return;
  const client=state.clients.find(c=>c.id===q.clientId)||{};
  const company=q.company||{name:"Hydro Star",cnpj:"41.428.257/0001-26",phone:"(12) 98216-2998",email:"hydrostar@gmail.com",installationWarranty:"3 meses",equipmentWarranty:"Garantia do fabricante"};
  const items=Array.isArray(q.items)?q.items:[];
