@@ -37,9 +37,9 @@ Gerar, a partir de um orçamento salvo no CRM, um PDF reutilizável que preserve
 
 ## Estado atual da implementação
 
-Foi adicionada uma primeira versão funcional do gerador de pré-visualização para impressão, com cinco páginas A4, identidade visual em ameixa/dourado, campos dinâmicos do orçamento, valores e descontos existentes, lista de materiais e condições comerciais. O botão **Gerar PDF** aparece na lista de orçamentos e abre uma nova janela; nela, a pessoa pode usar **Imprimir / Salvar como PDF** ou fechar a pré-visualização.
+Foi adicionada uma versão revisada do gerador de pré-visualização para impressão, com cinco páginas A4. A composição foi aproximada do modelo Hydro Star do Canva com capa ameixa/dourada mais ornamentada, hierarquia tipográfica editorial, cabeçalhos com detalhes dourados, resumo de investimento e faixas de pagamento com as condições 0%, 4% e 7%, além da lista de materiais e condições comerciais. Os campos continuam dinâmicos, conforme o orçamento selecionado. O botão **Gerar PDF** aparece na lista de orçamentos e abre uma nova janela; nela, a pessoa pode usar **Imprimir / Salvar como PDF** ou fechar a pré-visualização.
 
-Esta versão recria a estrutura com CSS e HTML e **ainda não é uma cópia pixel a pixel do arquivo do Canva**. O PDF de referência contém dados de uma cliente real e não é usado como fundo. Para uma correspondência visual exata, ainda será necessário obter/exportar do Canva os elementos gráficos reutilizáveis sem os dados da cliente e fazer uma revisão visual comparativa.
+Esta versão recria a estrutura com CSS e HTML e **ainda não é uma cópia pixel a pixel do arquivo do Canva**. A revisão atual melhora a hierarquia visual e aproxima a capa, o resumo financeiro e as condições de pagamento, mas ainda exige comparação visual página a página. O PDF de referência contém dados de uma cliente real e não é usado como fundo. Para uma correspondência visual exata, ainda será necessário obter/exportar do Canva os elementos gráficos reutilizáveis sem os dados da cliente e fazer uma revisão visual comparativa.
 
 ## Critérios de validação
 
