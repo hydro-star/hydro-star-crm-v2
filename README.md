@@ -41,3 +41,22 @@ O repositório contém o código da aplicação, não os cadastros feitos pelos 
 - Não coloque dados de clientes, backups, senhas, tokens ou chaves privadas no repositório.
 - O armazenamento local não é um backup automático; exporte o arquivo JSON periodicamente.
 - Para uso em equipe ou sincronização entre dispositivos, será necessário adicionar um backend com autenticação e regras de acesso adequadas.
+
+## Evolução segura da arquitetura
+
+O CRM é uma aplicação estática, sem etapa de build ou suíte de testes automatizada no estado atual. O JavaScript principal fica em `js/app.js`; por isso, mudanças estruturais devem ser graduais e validadas antes de avançar.
+
+### Regras para refatoração
+
+1. Trabalhar em uma branch de desenvolvimento; não editar `main` diretamente.
+2. Fazer uma mudança funcional por vez e manter os fluxos existentes.
+3. Validar a sintaxe JavaScript antes de cada alteração ser considerada pronta.
+4. Conferir inicialização, navegação, formulários e persistência local após mudanças que afetem o núcleo.
+5. Separar responsabilidades em módulos pequenos quando houver fronteiras claras, começando por funcionalidades isoláveis como geração de PDF.
+6. Não introduzir frameworks, ferramentas de build ou dependências novas sem necessidade demonstrada.
+7. Manter a lógica de cálculo separada da apresentação e não expor margem, risco ou cálculos internos no PDF do cliente.
+8. Não considerar uma mudança concluída apenas porque o código foi gravado: testar o comportamento no navegador.
+
+### Aplicação gradual de SOLID
+
+SOLID será usado como guia, não como reescrita geral. O foco inicial é responsabilidade única e dependências explícitas: isolar cálculo de orçamento, armazenamento e exportação de PDF sem alterar a interface ou o formato dos dados existentes. Cada extração deve preservar compatibilidade e ser revisada separadamente.
