@@ -66,7 +66,9 @@ async function generateQuotePdfFromTemplate(q){
   a.href=url;a.download="Hydro-Star-Proposta.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
  }catch(e){console.error(e);alert("Falha ao gerar PDF com o modelo Canva: "+(e.message||"erro desconhecido"))}
 }
-function generateQuotePdf(q){\n generateQuotePdfFromTemplate(q);\n return;
+function generateQuotePdf(q){
+ generateQuotePdfFromTemplate(q);
+ return;
  const client=state.clients.find(c=>c.id===q.clientId)||{};
  const company=q.company||{name:"Hydro Star",cnpj:"41.428.257/0001-26",phone:"(12) 98216-2998",email:"hydrostar@gmail.com",installationWarranty:"3 meses",equipmentWarranty:"Garantia do fabricante"};
  const items=Array.isArray(q.items)?q.items:[];
