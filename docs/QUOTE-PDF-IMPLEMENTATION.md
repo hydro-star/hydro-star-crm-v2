@@ -35,9 +35,11 @@ Gerar, a partir de um orçamento salvo no CRM, um PDF reutilizável que preserve
 5. O nome e os dados do cliente devem vir do orçamento aberto, nunca de um exemplo fixo.
 6. A geração do arquivo não deve salvar automaticamente o orçamento nem mudar seu status.
 
-## Pré-requisito do modelo
+## Estado atual da implementação
 
-O PDF de referência disponível contém os dados de uma cliente real. Ele pode ser usado para conferir o desenho, mas não deve ser incorporado diretamente como fundo reutilizável, pois os dados impressos ficariam presos no documento e poderiam aparecer junto dos novos dados. Antes da implementação visual final, é necessário preparar um modelo-base sem dados específicos de cliente, preservando os elementos gráficos, as cinco páginas e a paginação do original.
+Foi adicionada uma primeira versão funcional do gerador de pré-visualização para impressão, com cinco páginas A4, identidade visual em ameixa/dourado, campos dinâmicos do orçamento, valores e descontos existentes, lista de materiais e condições comerciais. O botão **Gerar PDF** aparece na lista de orçamentos e abre uma nova janela; nela, a pessoa pode usar **Imprimir / Salvar como PDF** ou fechar a pré-visualização.
+
+Esta versão recria a estrutura com CSS e HTML e **ainda não é uma cópia pixel a pixel do arquivo do Canva**. O PDF de referência contém dados de uma cliente real e não é usado como fundo. Para uma correspondência visual exata, ainda será necessário obter/exportar do Canva os elementos gráficos reutilizáveis sem os dados da cliente e fazer uma revisão visual comparativa.
 
 ## Critérios de validação
 
@@ -47,4 +49,6 @@ O PDF de referência disponível contém os dados de uma cliente real. Ele pode 
 - Prazo apresentado em dias.
 - Nenhuma observação interna ou dado de outro cliente no arquivo.
 - Pré-visualização antes de imprimir/baixar.
+- Testar bloqueio de pop-ups e impressão em navegadores comuns.
 - Teste sem alterações na agenda, clientes, ordens de serviço e armazenamento local.
+- Comparar visualmente com o modelo do Canva antes de aprovar a publicação.
